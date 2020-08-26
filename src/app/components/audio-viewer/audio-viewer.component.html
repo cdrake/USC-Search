@@ -1,0 +1,7 @@
+<div class="audio-player" *ngIf="audio$ | async as audio" >
+    <audio src="{{audio.url}}" controls>
+        Your browser does not support the audio tag.
+    </audio>
+    <div style="margin: 10px" [innerHTML]="audio.text | linkify | highlightSearchTerms: 'text' | async">        
+    </div>
+</div>

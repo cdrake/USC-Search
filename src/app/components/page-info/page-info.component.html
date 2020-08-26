@@ -1,0 +1,3 @@
+<div *ngIf="pageInfo$ | async" style="margin: 10px;">
+    {{(pageInfo$ | async)?.text}}
+</div>

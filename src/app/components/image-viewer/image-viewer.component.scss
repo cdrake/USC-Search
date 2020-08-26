@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.image-viewer {
+    height: 50vh;
+    margin: 10px;
+    overflow: auto;
+}
+
+.page-text {
+    max-height: 50vh;
+    float: right;
+    overflow: scroll;
+    background-color: midnightblue;
+    color: white;
+    text-overflow: ellipsis;
+    padding: 10px;      
+}
+
+.page-info h2 {
+    text-align: center;
+}
+
+@media only screen and (max-width: 485px)  {
+    .page-text {
+        float: none;  
+        margin: auto;
+        
+    }
+
+    mat-expansion-panel {
+        width: 75%!important;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .container {
+        width: 100%!important;
+        // padding: 40px;
+        // margin: 10px;
+    }
+}

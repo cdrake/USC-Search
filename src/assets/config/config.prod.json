@@ -1,0 +1,14 @@
+{
+    "envName": "PROD",
+     "dataSources": [
+         {
+             "key": "usc",
+             "name": "USC Digital Collection",
+             "url": "https://digital.tcl.sc.edu/digital",
+             "searchPrefix": "api/search",
+             "iiifPrefix": "iiif",
+             "itemPrefix": "api/singleitem/collection",
+             "type": "contentDM"
+         }
+     ] 
+}

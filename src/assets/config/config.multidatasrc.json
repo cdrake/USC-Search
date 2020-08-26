@@ -1,0 +1,24 @@
+{
+    "envName": "MULTIDATASRC",
+     "dataSources": [
+         {
+             "key": "usc",
+             "name": "USC Digital Collection",
+             "url": "https://digital.tcl.sc.edu/digital",
+             "searchPrefix": "api/search",
+             "iiifPrefix": "iiif",
+             "itemPrefix": "api/singleitem/collection",
+             "type": "contentDM"
+         },
+         {
+            "key": "uo",
+            "name": "UO Digital Collection",
+            "url": "https://digital.tcl.uo.edu/digital",
+            "searchPrefix": "api/search",
+            "iiifPrefix": "iiif",
+            "itemPrefix": "api/singleitem/collection",
+            "type": "contentDM"
+        }
+
+     ] 
+}

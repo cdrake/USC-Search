@@ -1,0 +1,5 @@
+<mat-tab-group>
+    <mat-tab *ngFor="let dataSource of dataSources" [label]="dataSource.name">
+        <app-data-source-results [dataSource]="dataSource"></app-data-source-results>
+    </mat-tab>
+</mat-tab-group>    

@@ -1,0 +1,17 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+<div class="container">
+    <div id="seadragon-viewer" class="image-viewer" #viewer></div>
+    <mat-accordion>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+            <mat-panel-title>
+                Page Info
+            </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="page-info" *ngIf="pageInfo$ | async as pageInfo" >
+                <h2>{{getPageTitle(pageInfo)}}</h2>
+                <div class="page-text" [innerHTML]="pageInfo.text | linkify | highlightSearchTerms: 'text' | async" style="margin: 10px;"></div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

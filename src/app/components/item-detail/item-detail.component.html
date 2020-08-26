@@ -1,0 +1,33 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="item-viewer" *ngIf="item$ | async as item">
+    <div class="item-title">
+        <h1>{{getFieldValue(item, 'title')}}</h1>
+    </div>
+    <div [ngSwitch]="getFormat(item).substr(0, 5)">        
+        <app-image-viewer *ngSwitchCase="'image'" 
+                    [image$]="item$"
+                    [collection]="collection"                    
+                ></app-image-viewer>
+        <app-video-viewer *ngSwitchCase="'video'" 
+            [video$]="item$"
+            [collection]="collection"
+            [dataSource]="dataSource"
+        ></app-video-viewer>
+        <app-audio-viewer *ngSwitchCase="'audio'" 
+                    [audio$]="item$"                    
+                ></app-audio-viewer>
+        <app-audio-viewer *ngSwitchCase="'sound'"
+            [audio$]="item$">
+        </app-audio-viewer>        
+    </div>
+    <mat-accordion>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Item Info
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-item-metadata [item$]="item$"></app-item-metadata>    
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

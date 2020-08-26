@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AppConfigService } from './services/app-config.service'
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'usc-search';
+  title = 'USC Digital Search';
+  environmentName: string;
+  
+  constructor() {
+    AppConfigService.settings$.subscribe( () => {
+        this.environmentName = AppConfigService.settings.envName;
+      }
+    );
+  }
 }

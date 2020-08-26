@@ -1,0 +1,22 @@
+<div style="margin-left:10px;"><h1>Search Results</h1></div>
+<div style="margin:10px;" *ngIf="results$ | async as results">    
+<div *ngFor="let item of results.items">
+    <a [routerLink]="['/item', dataSource.key, item.collectionAlias, item.itemId]">
+        <div class="row">
+            <div class="column">
+                <img [src]="getThumbnailUri(item)" [alt]="item.title" style="width:100px;">
+            </div>
+            <div class="column">
+                <h2>{{ item.title }}</h2>
+                {{getDescription(item)}}
+            </div>
+        </div>
+    </a>
+</div>
+<mat-paginator [length]="resultsCount"
+              [pageSize]="itemsPerPage"
+              [pageIndex]="pageIndex"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              (page)="pageEvent = getResultsPage($event)">
+</mat-paginator>
+</div>

@@ -1,0 +1,31 @@
+.video-player {
+    text-align: center;
+    background-color: black;
+    flex: 1 0 auto;
+    padding: 10px 0px;
+}
+
+.media-playlist {
+    float: right;    
+}
+
+mat-slide-toggle {
+    color: white;
+}
+
+@media only screen and (max-width: 485px)  {
+    video {
+        float: none;
+        width: 100%!important;
+        margin: 0px;
+    }
+
+    .video-player {
+        padding: 0px;        
+    }
+
+    .media-playlist {
+        float: none;
+    }
+    
+}

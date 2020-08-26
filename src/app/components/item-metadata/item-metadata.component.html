@@ -1,0 +1,13 @@
+<div class="metadata" *ngIf="item$ | async as item">
+    <ul>
+        <li *ngFor="let field of filterFields(item.fields)">    
+        <div class="row" >
+            <div class="column">
+            <b>{{field.label}}:</b>
+            </div>
+            <div class="column" [innerHTML]="field.value | linkify | highlightSearchTerms: field.key | async">         
+            </div>    
+        </div>
+        </li>
+    </ul>
+</div>  

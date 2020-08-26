@@ -1,0 +1,15 @@
+.row {
+    display: flex;
+  }
+  
+.column {
+    float: left;
+    padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
