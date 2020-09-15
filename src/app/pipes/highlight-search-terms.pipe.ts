@@ -44,7 +44,7 @@ export class HighlightSearchTermsPipe implements PipeTransform {
     let markedText = fieldValue;
     //TODO(cdrake): tokenize queryMap search term unless in quotes
     if(this.queryMap.has(fieldName)) {
-      const searchTerm = this.queryMap.get(fieldName);
+      const searchTerm = this.queryMap.get(fieldName).replace(/^['"]|['"]$/g, '');
       const re = new RegExp(searchTerm, 'gi');
       markedText = fieldValue.toString().replace(re, '<mark>$&</mark>'); 
     }
