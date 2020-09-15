@@ -50,7 +50,7 @@ export class SearchComponent implements OnInit {
         const fieldName = fieldParts[0].trim().toLowerCase();
         const fieldValue = fieldParts.slice(1).join(':');
         if(fieldName && fieldValue) {
-          fieldMap.set(fieldName, fieldValue);
+          fieldMap.set(fieldName, fieldValue.trim());
         }
       }
     }
