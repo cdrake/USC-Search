@@ -1,12 +1,16 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div class="video-player" *ngIf="(video$ | async) as video" >
-    <video #video src="{{(video$ | async)?.url}}" controls (ended)="onVideoEnded($event)">
-        Your browser does not support the video tag.
-    </video>
-    <div class="media-playlist" *ngIf="videoUrls && videoUrls.length > 0">
-        <mat-slide-toggle name="autoplay" color="primary">Autoplay</mat-slide-toggle>
-        <div *ngFor="let relatedThumb of thumbnailUrls">
-        <img src="{{relatedThumb}}" (click)="changeVideo($event, relatedThumb)">
+    <div class="column-one">
+        <video #video src="{{(video$ | async)?.url}}" controls (ended)="onVideoEnded($event)">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <div class="column-two">
+        <div class="media-playlist" *ngIf="videoUrls && videoUrls.length > 0">
+            <mat-slide-toggle name="autoplay" color="primary">Autoplay</mat-slide-toggle>
+            <div *ngFor="let relatedThumb of thumbnailUrls">
+            <img src="{{relatedThumb}}" (click)="changeVideo($event, relatedThumb)">
+            </div>
         </div>
     </div>
 </div>

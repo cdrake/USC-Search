@@ -1,19 +1,33 @@
 .video-player {
     text-align: center;
     background-color: black;
-    flex: 1 0 auto;
+    // flex: 1 0 auto;
+    display: flex;
+    flex-wrap: wrap;
     padding: 10px 0px;
 }
 
 .media-playlist {
-    float: right;    
+    float: right;
+    text-align: center;    
 }
 
 mat-slide-toggle {
     color: white;
 }
 
-@media only screen and (max-width: 485px)  {
+.column-one {
+    // flex: 70%;
+    padding: 10px;
+  }
+  
+.column-two {
+    flex: 30%;
+    padding: 10px;
+    // float: right;   
+}
+
+@media only screen and (max-width: 780px)  {
     video {
         float: none;
         width: 100%!important;
@@ -26,6 +40,7 @@ mat-slide-toggle {
 
     .media-playlist {
         float: none;
+        text-align: center;
     }
     
 }

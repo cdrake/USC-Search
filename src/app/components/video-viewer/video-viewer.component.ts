@@ -1,3 +1,8 @@
+/*
+* Example URL for multi-reel
+* http://localhost:4200/item/usc/MVTNTest/15
+*/
+
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { Observable } from 'rxjs';
