@@ -20,11 +20,26 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  isQueryFormatted(query: string): boolean {
+    let isFormatted = true;
+    const fields = query.split(FIELD_DELIMITER);
+    for(const field of fields) {
+      const fieldParts = field.split(FIELD_ASSIGNMENT_OPERATOR);
+      if(fieldParts[0].trim().includes(' ')) {
+        console.log('field name includes spaces');
+        isFormatted = false;
+        break;
+      }
+    }
+
+    return isFormatted;
+  }
+
   handleUserMessage(text: string) {    
     console.log('new query map set');
     let fieldMap: Map<string, string> = new Map();
     const fields = text.split(FIELD_DELIMITER);
-    if(fields.length === 1) {
+    if(!this.isQueryFormatted(text)) {
       fieldMap.set('any', text);
     }
     else {

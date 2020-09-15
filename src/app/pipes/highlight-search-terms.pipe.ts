@@ -40,19 +40,27 @@ export class HighlightSearchTermsPipe implements PipeTransform {
     });
   }
 
-  markSearchTerms(fieldValue, fieldName) : string {
-    if(this.queryMap.has('any') && fieldValue) {
-      const searchTerm = this.queryMap.get('any');
+  getMarkedText(fieldName: string, fieldValue: string): string {
+    let markedText = fieldValue;
+    //TODO(cdrake): tokenize queryMap search term unless in quotes
+    if(this.queryMap.has(fieldName)) {
+      const searchTerm = this.queryMap.get(fieldName);
       const re = new RegExp(searchTerm, 'gi');
-      const markedText = fieldValue.toString().replace(re, '<mark>$&</mark>');
-      // console.log(markedText);          
-      return markedText;
-    }
-    else {
-      // console.log('field not found in search terms: ' + fieldName);
-      // console.log(fieldValue);
-      return fieldValue;
+      markedText = fieldValue.toString().replace(re, '<mark>$&</mark>'); 
     }
 
+    return markedText;
+  }
+
+  markSearchTerms(fieldValue: string, fieldName: string) : string {
+    let markedText = fieldValue;
+
+    //TODO(cdrake): handle "mark" search term
+    if(fieldValue) {
+      markedText = this.getMarkedText('any', fieldValue);
+      markedText = this.getMarkedText(fieldName, markedText);
+    }
+
+    return markedText;
   }
 }
