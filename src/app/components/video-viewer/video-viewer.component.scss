@@ -23,14 +23,12 @@ mat-slide-toggle {
 }
 
 .column-one {
-    // flex: 70%;
     padding: 10px;
   }
   
 .column-two {
     flex: 30%;
     padding: 10px;
-    // float: right;   
 }
 
 @media only screen and (max-width: 780px)  {
