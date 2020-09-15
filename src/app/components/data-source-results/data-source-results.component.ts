@@ -40,6 +40,8 @@ export class DataSourceResultsComponent implements OnInit {
     this.queryMap$.subscribe(queryMap => {
       // TODO(cdrake): check type of data source
       this.baseQuery = buildCONTENTdmBaseQueryFromMap(this.dataSource.url, queryMap);
+      console.log('base query is:');
+      console.log(this.baseQuery);
       this.loadResults();  
     });
   }
