@@ -58,7 +58,6 @@ export class HighlightSearchTermsPipe implements PipeTransform {
   markSearchTerms(fieldValue: string, fieldName: string) : string {
     let markedText = fieldValue;
 
-    //TODO(cdrake): handle "mark" search term
     if(fieldValue) {
       markedText = this.getMarkedText('any', fieldValue);
       markedText = this.getMarkedText(fieldName, markedText);
