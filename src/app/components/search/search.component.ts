@@ -25,11 +25,20 @@ export class SearchComponent implements OnInit {
     const fields = query.split(FIELD_DELIMITER);
     for(const field of fields) {
       const fieldParts = field.split(FIELD_ASSIGNMENT_OPERATOR);
+      // if no colon
+      if(fieldParts.length < 2) {
+        isFormatted = false;
+        break;
+      }
+
+      // if spaces in field name
       if(fieldParts[0].trim().includes(' ')) {
         console.log('field name includes spaces');
         isFormatted = false;
         break;
       }
+
+
     }
 
     return isFormatted;
