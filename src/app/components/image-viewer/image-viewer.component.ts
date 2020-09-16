@@ -40,7 +40,6 @@ export class ImageViewerComponent implements OnInit {
       console.log(urls);
       const osd = new dragon.Viewer({
         element: this.viewer.nativeElement,
-        degrees: 90,
         showRotationControl: true,
         // Enable touch rotation on tactile devices
         gestureSettingsTouch: {
