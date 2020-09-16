@@ -1,7 +1,7 @@
 // const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
 const searchApiPrefix = 'api/search';
 const withDescription = 'fields/descri';
-const fieldNameMap = {'any': 'title', 'date-period': 'date', 'filmed-by': 'contri', 'filmed-location': 'coveraa', 'film-title': 'title', 'production-unit': 'creato', 'silent-film': 'dateb', 'title': 'title', 'description': 'descri', 'subject': 'subjec'};
+const fieldNameMap = {'any': 'CISOSEARCHALL', 'date-period': 'date', 'filmed-by': 'contri', 'filmed-location': 'coveraa', 'film-title': 'title', 'production-unit': 'creato', 'silent-film': 'dateb', 'title': 'title', 'description': 'descri', 'subject': 'subjec'};
 
 export function buildCONTENTdmSubQueryFromQueryMap(baseApiPrefix: string, sub: string, queryMap: Map<string, string>) {
         let subQueryMap = new Map([...queryMap]);
