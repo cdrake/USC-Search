@@ -1,4 +1,4 @@
-<div style="margin-left:10px;"><h1>Search Results</h1></div>
+<div style="margin-left:10px;"><h1>SEARCH THE UNIVERSITY OF SOUTH CAROLINA</h1></div>
 <div style="margin:10px;" *ngIf="results$ | async as results">    
 <div *ngFor="let item of results.items">
     <a [routerLink]="['/item', dataSource.key, item.collectionAlias, item.itemId]">

@@ -27,6 +27,7 @@ import { LinkifyPipe } from './pipes/linkify.pipe';
 import { PageInfoComponent } from './components/page-info/page-info.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { HighlightSearchTermsPipe } from './pipes/highlight-search-terms.pipe';
+import {MatToolbarModule} from '@angular/material/toolbar';
 
 export function initializeApp(appConfig: AppConfigService) {
   console.log('initalize app called');
@@ -61,6 +62,7 @@ export function initializeApp(appConfig: AppConfigService) {
     MatPaginatorModule,
     MatSlideToggleModule,
     MatTabsModule,
+    MatToolbarModule,
     StoreModule.forRoot({      
       pageState: contentDMQueryPageStateReducer,
       queryMap: queryMapReducer
