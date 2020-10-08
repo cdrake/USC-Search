@@ -12,6 +12,7 @@
                 <h2>{{getPageTitle(pageInfo)}}</h2>
                 <div class="page-text" [innerHTML]="pageInfo.text | linkify | highlightSearchTerms: 'text' | async" style="margin: 10px;"></div>
             </div>
+            <div [innerHTML]="pageText | linkify | highlightSearchTerms: 'text' | async" ></div>
         </mat-expansion-panel>
     </mat-accordion>
 </div>

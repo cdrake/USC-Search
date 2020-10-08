@@ -79,7 +79,9 @@ export function initializeApp(appConfig: AppConfigService) {
       useFactory: initializeApp,
       deps: [AppConfigService],
       multi: true,
-    }
+    },
+    HighlightSearchTermsPipe,
+    LinkifyPipe
   ],
   bootstrap: [AppComponent]
 })
