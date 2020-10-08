@@ -37,7 +37,7 @@ export class ImageViewerComponent implements OnInit {
 
       console.log('collection:' + this.collection);
       console.log(item);
-      const urls = getIIIFUrls(item);
+      const urls = getIIIFUrls(item, digitalApiPrefix, iiifPrefix, this.collection);
       console.log(urls);
       const osd = new dragon.Viewer({
         element: this.viewer.nativeElement,

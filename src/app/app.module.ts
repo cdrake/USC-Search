@@ -29,6 +29,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import { HighlightSearchTermsPipe } from './pipes/highlight-search-terms.pipe';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { BookViewerComponent } from './components/book-viewer/book-viewer.component';
+import {MatButtonModule} from '@angular/material/button';
 
 export function initializeApp(appConfig: AppConfigService) {
   console.log('initalize app called');
@@ -58,6 +59,7 @@ export function initializeApp(appConfig: AppConfigService) {
     CommonModule,
     FormsModule,
     HttpClientModule,
+    MatButtonModule,
     MatExpansionModule,
     MatIconModule,
     MatInputModule,

@@ -1,6 +1,13 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input} from '@angular/core';
 import * as dragon from 'openseadragon'
+import { Observable } from 'rxjs';
+import { CONTENTdmItem, CONTENTdmItemNodePage, CONTENTdmItemPageInfo } from 'src/app/models/contentdm-item.model';
+import { getPageInfoArray, getIIIFUrls } from 'src/app/utils/iiif/contentdm-iiif-utils';
 
+const iiifPrefix = "https://digital.tcl.sc.edu/digital/iiif";
+const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
+const api = '/api/singleitem/collection';
 const PAGE_BUFFER_SIZE = 0.05;
 @Component({
   selector: 'app-book-viewer',
@@ -10,8 +17,12 @@ const PAGE_BUFFER_SIZE = 0.05;
 export class BookViewerComponent implements OnInit {
 
   @ViewChild('viewer') viewer: ElementRef;
-  @Input() tileSourceUrls: string[];
+  @Input() book$: Observable<CONTENTdmItem>;
+  @Input() collection: string;
+  pageInfo$: Observable<CONTENTdmItemPageInfo>;
   osd: dragon.Viewer;
+  tileSourceUrls: string[];
+  pages: CONTENTdmItemNodePage[];
   boundsSet = false;
   secondImageLoaded = false;
   imageIndexMap = new Map<number, dragon.TiledImage>();
@@ -23,7 +34,7 @@ export class BookViewerComponent implements OnInit {
   pageOneText = '';
   pageTwoText = '';
 
-  constructor() { 
+  constructor(private http: HttpClient) { 
     window['angularComponentRef'] = this; 
   }
 
@@ -36,39 +47,35 @@ export class BookViewerComponent implements OnInit {
       this.pageTwoText = text;
     }
     this.textIndexMap.set(pageIndex, text);
-
-    console.log('text is');
-    console.log(this.textIndexMap);
   }
 
   ngOnInit(): void {
   }
 
   ngAfterViewInit(): void {
-    console.log('found ' + this.tileSourceUrls.length + ' urls');
-    this.order = new Array<number>(this.tileSourceUrls.length);
-    // const tileSources = this.tileSourceUrls.map(tileSourceUrl => new dragon.IIIFTileSource({'url': tileSourceUrl}));
-
-    this.osd = new dragon.Viewer({
-      element: this.viewer.nativeElement,
-      // degrees: 90,
-      showRotationControl: true,
-      // Enable touch rotation on tactile devices
-      gestureSettingsTouch: {
-          pinchToZoom: true,            
-      },
-      prefixUrl: "//openseadragon.github.io/openseadragon/images/",
-      autoResize: false,
-      tileSources: this.tileSourceUrls,
+    this.book$.subscribe(item => {
+      this.pages = getPageInfoArray(item);
+      console.log('collection:' + this.collection);
+      console.log(item);
+      this.tileSourceUrls = getIIIFUrls(item, digitalApiPrefix, iiifPrefix, this.collection);
+      this.osd = new dragon.Viewer({
+        element: this.viewer.nativeElement,
+        // Enable touch rotation on tactile devices
+        gestureSettingsTouch: {
+            pinchToZoom: true,            
+        },
+        prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+        autoResize: false,
+        tileSources: this.tileSourceUrls,
+      });      
+      console.log('found ' + this.tileSourceUrls.length + ' urls');
     });
+
+     
 
     setInterval(() => {
       if(this.imagesLoaded) {
-        // console.log('images loaded');
-        
-
         if(this.imageToViewIndex != this.currentPageIndex) {
-          //console.log('loading new images');
           // reset text
           this.pageOneText = '';
           this.pageTwoText = '';
@@ -78,18 +85,17 @@ export class BookViewerComponent implements OnInit {
             this.osd.world.update();
             // add both images
             const firstImage = this.imageIndexMap.get(this.imageToViewIndex);
-            console.log(firstImage);
             if(firstImage) {
-              console.log('adding new image');
               this.osd.world.addItem(firstImage);
-              
               // add text for page one
               if(this.textIndexMap.has(this.imageToViewIndex)) {
                 this.pageOneText = this.textIndexMap.get(this.imageToViewIndex);
-                console.log('setting text for page');
               }
               else {
                 console.log('text not found');
+                // request text
+                let i = this.imageToViewIndex                
+                this.getPageText(this.imageToViewIndex);
               }
 
               const secondTiledImage = this.imageIndexMap.get(this.imageToViewIndex + 1);
@@ -97,8 +103,11 @@ export class BookViewerComponent implements OnInit {
                 this.osd.world.addItem(secondTiledImage);
                 secondTiledImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
                 // add text for page two
-                if(this.textIndexMap.has(this.imageToViewIndex + 1)) {
+                if(this.textIndexMap.has(this.imageToViewIndex + 1)) {                  
                   this.pageTwoText = this.textIndexMap.get(this.imageToViewIndex + 1);
+                }
+                else {
+                  this.getPageText(this.imageToViewIndex + 1);
                 }
               }
               else {
@@ -121,7 +130,6 @@ export class BookViewerComponent implements OnInit {
       }
       else {
         let itemCount = this.osd.world.getItemCount();
-        //this.osd.world.setItemIndex()
         if(itemCount === this.tileSourceUrls.length) {                 
           
           for(let i = 0; i <  itemCount; i++) {
@@ -145,7 +153,6 @@ export class BookViewerComponent implements OnInit {
 
           const firstTiledImage = this.osd.world.getItemAt(0);
           if(!this.secondImageLoaded) {
-            console.log(firstTiledImage);
             this.secondImageLoaded = true;
           }
           this.adjustBounds(firstTiledImage);
@@ -169,14 +176,35 @@ export class BookViewerComponent implements OnInit {
   }
 
   prev(): void {
-    this.imageToViewIndex -= 2;
-    console.log('prev pressed');
+    if(this.imageToViewIndex > 1) {
+      this.imageToViewIndex -= 2;
+      console.log('prev pressed');
+    }
   }
 
   next(): void {
-    this.imageToViewIndex += 2;
-    console.log('next pressed');
+    if(this.imageToViewIndex < this.tileSourceUrls.length - 2) {
+      this.imageToViewIndex += 2;
+      console.log('next pressed');
+    }
     
+  }
+
+  getPageTextObservable(pageIndex: number): Observable<CONTENTdmItemPageInfo> {
+    const pageInfoUri = `${digitalApiPrefix}${api}/${this.collection}/id/${this.pages[pageIndex].pageptr}`;
+    return this.http.get<CONTENTdmItemPageInfo>(pageInfoUri);      
+  }
+
+  getPageText(pageIndex: number): void {
+    this.getPageTextObservable(pageIndex).subscribe(page => {
+      this.textIndexMap.set(pageIndex, page.text);
+      if(this.imageToViewIndex === pageIndex) {
+        this.pageOneText = page.text;
+      }
+      else if(this.imageToViewIndex + 1 === pageIndex){
+        this.pageTwoText = page.text;
+      }
+    });
   }
 
 }

@@ -1,10 +1,7 @@
-import { CONTENTdmItem, CONTENTdmItemNode, CONTENTdmItemNodePage, CONTENTdmItemPageInfo } from '../../models/contentdm-item.model';
+import { CONTENTdmItem, CONTENTdmItemNode, CONTENTdmItemNodePage } from '../../models/contentdm-item.model';
 
-const iiifPrefix = "https://digital.tcl.sc.edu/digital/iiif";
-const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
-
-export function getIIIFUrls(item: CONTENTdmItem): string[] {
-    let urls = getPageInfoArray(item).filter(url => url.hasOwnProperty('pageptr')).map(url => `${iiifPrefix}/${this.collection}/${url.pageptr}/info.json`);
+export function getIIIFUrls(item: CONTENTdmItem, digitalApiPrefix: string, iiifPrefix: string, collection: string): string[] {
+    let urls = getPageInfoArray(item).filter(url => url.hasOwnProperty('pageptr')).map(url => `${iiifPrefix}/${collection}/${url.pageptr}/info.json`);
    
     if(urls.length === 0) {
       return [`${digitalApiPrefix}${item.iiifInfoUri}`];
@@ -49,20 +46,20 @@ function getPageInfoArrayFromNodeArray(nodes: CONTENTdmItemNode[]): CONTENTdmIte
 function getPageInfoArrayFromNode(node: CONTENTdmItemNode): CONTENTdmItemNodePage[]  {
     let pages = new Array<CONTENTdmItemNodePage>();
     if(node.hasOwnProperty('page')) {
-      if(Array.isArray(node.page)) {
+        if(Array.isArray(node.page)) {
         pages = pages.concat(node.page);
-      }
-      else {
+        }
+        else {
         pages.push(node.page);
-      }      
+        }      
     }
     if(node.hasOwnProperty('node')) {
-      if(Array.isArray(node.node)) {
+        if(Array.isArray(node.node)) {
         pages = pages.concat(getPageInfoArrayFromNodeArray(node.node));
-      }
-      else {
+        }
+        else {
         pages = pages.concat(getPageInfoArrayFromNode(node.node));
-      }
+        }
     }
     return pages;
-  }
+}

@@ -82,6 +82,12 @@ export class ItemDetailComponent implements OnInit {
     return formatValue;
   }
 
+  getTileSourceUrls(item: CONTENTdmItem): string[] {
+    let tileSourceUrls = [];
+    
+    return tileSourceUrls;
+  }
+
   
 
 }

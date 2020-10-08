@@ -1,12 +1,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
 <div class="container">
     <div id="book-viewer" class="book-viewer" #viewer></div>
-    <div class="text-container">
-    <div id="page-1-text" class="text-page">
-        {{pageOneText}}
+    <div class="button-container">
+        <button mat-raised-button color="primary" id="prev-button" (click)="prev()">Previous</button><button mat-raised-button color="accent" id="next-button" (click)="next()">Next</button>
     </div>
-    <div id="page-2-text" class="text-page" [innerHTML]="pageTwoText">
-    </div>
+    <mat-accordion>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+            <mat-panel-title>
+                Page Info
+            </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="text-container">
+                <div id="page-1-text" class="text-page">
+                    {{pageOneText}}
+                </div>
+                <div id="page-2-text" class="text-page" [innerHTML]="pageTwoText">
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    
 </div>
-</div>
-<button id="prev-button" (click)="prev()">Previous</button><button id="next-button" (click)="next()">Next</button>
+
