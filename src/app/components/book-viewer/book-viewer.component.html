@@ -1,1 +1,12 @@
-<p>book-viewer works!</p>
+<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+<div class="container">
+    <div id="book-viewer" class="book-viewer" #viewer></div>
+    <div class="text-container">
+    <div id="page-1-text" class="text-page">
+        {{pageOneText}}
+    </div>
+    <div id="page-2-text" class="text-page" [innerHTML]="pageTwoText">
+    </div>
+</div>
+</div>
+<button id="prev-button" (click)="prev()">Previous</button><button id="next-button" (click)="next()">Next</button>

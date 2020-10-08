@@ -3,7 +3,7 @@
     <div class="item-title">
         <h1>{{getFieldValue(item, 'title')}}</h1>
     </div>
-    <div [ngSwitch]="getFormat(item).substr(0, 5)">        
+    <div [ngSwitch]="getFormat(item).substr(0, 5)">          
         <app-image-viewer *ngSwitchCase="'image'" 
                     [image$]="item$"
                     [collection]="collection"                    

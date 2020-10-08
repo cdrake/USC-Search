@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CONTENTdmItem } from '../../models/contentdm-item.model';
 import { HttpClient } from '@angular/common/http';
+import { getPageInfoArray } from '../../utils/iiif/contentdm-iiif-utils';
 
 const formats = ['video', 'audio', 'image'];
 
@@ -56,6 +57,9 @@ export class ItemDetailComponent implements OnInit {
     }
     let formatValue = (formatField) ? formatField.value.toLowerCase() : 'unknown';
 
+    // check if this is a book
+
+
     formatValue = formatValue.substr(0, 5);
     if(!(formatValue in formats) && item.url) {
       switch(item.url.slice(-3)) {
@@ -67,8 +71,17 @@ export class ItemDetailComponent implements OnInit {
           break;
       }
     }
+
+    if(formatValue === 'image') {
+      const pageArray = getPageInfoArray(item);
+      if(Array.isArray(pageArray) && pageArray.length > 1) {
+        formatValue = 'book';
+      }
+    }
     // console.log('format: ' + format)
     return formatValue;
   }
+
+  
 
 }
