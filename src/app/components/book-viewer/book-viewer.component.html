@@ -12,10 +12,9 @@
             </mat-panel-title>
             </mat-expansion-panel-header>
             <div class="text-container">
-                <div id="page-1-text" class="text-page">
-                    {{pageOneText}}
+                <div id="page-1-text" class="text-page" [innerHTML]="pageOneText | linkify | highlightSearchTerms: 'text' | async">
                 </div>
-                <div id="page-2-text" class="text-page" [innerHTML]="pageTwoText">
+                <div id="page-2-text" class="text-page" [innerHTML]="pageTwoText | linkify | highlightSearchTerms: 'text' | async">
                 </div>
             </div>
         </mat-expansion-panel>
