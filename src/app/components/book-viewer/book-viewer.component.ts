@@ -4,6 +4,9 @@ import * as dragon from 'openseadragon'
 import { Observable } from 'rxjs';
 import { CONTENTdmItem, CONTENTdmItemNodePage, CONTENTdmItemPageInfo } from 'src/app/models/contentdm-item.model';
 import { getPageInfoArray, getIIIFUrls } from 'src/app/utils/iiif/contentdm-iiif-utils';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/models/app-state.model';
+import { SetQueryMap } from 'src/app/store/actions/query-map.actions';
 
 const iiifPrefix = "https://digital.tcl.sc.edu/digital/iiif";
 const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
@@ -20,6 +23,7 @@ export class BookViewerComponent implements OnInit {
   @Input() book$: Observable<CONTENTdmItem>;
   @Input() collection: string;
   pageInfo$: Observable<CONTENTdmItemPageInfo>;
+  queryMap$: Observable<Map<string, string>>;
   osd: dragon.Viewer;
   tileSourceUrls: string[];
   pages: CONTENTdmItemNodePage[];
@@ -33,8 +37,10 @@ export class BookViewerComponent implements OnInit {
   order: Array<number>;
   pageOneText = '';
   pageTwoText = '';
+  value = '';
+  queryMap: Map<string, string>;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient, private store: Store<AppState>) { 
     window['angularComponentRef'] = this; 
   }
 
@@ -49,12 +55,59 @@ export class BookViewerComponent implements OnInit {
     this.textIndexMap.set(pageIndex, text);
   }
 
+  handleNextSearch() {
+
+  }
+
+  handleSearch(text: string): void {
+    console.log('search text is ' + text);
+
+    // update text search term
+    this.queryMap.set('text', text);
+    this.store.dispatch(new SetQueryMap(this.queryMap));
+
+    const lowerText = text.toLocaleLowerCase();
+    for(const key of this.textIndexMap.keys()) {
+      const pageText = this.textIndexMap.get(key);
+      if(pageText && pageText.toLocaleLowerCase().includes(lowerText)) {
+        console.log(lowerText + ' found');
+        if(key % 2 === 0) {
+          this.imageToViewIndex = key;
+        }
+        else {
+          this.imageToViewIndex = key - 1;
+        }
+        console.log('page index changed to ' + this.imageToViewIndex);
+        break;
+      }
+    }
+  }
+
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.handleSearch(this.value);
+      this.value = '';
+    }
+  }
+
   ngOnInit(): void {
+    this.queryMap$ = this.store.select(state => state.queryMap);
+    this.queryMap$.subscribe(queryMap => {
+      console.log(queryMap);
+      this.queryMap = queryMap;
+      this.value = this.queryMap.has('text') ? this.queryMap.get('text') : '';
+    });
   }
 
   ngAfterViewInit(): void {
     this.book$.subscribe(item => {
       this.pages = getPageInfoArray(item);
+      
+      // get all of the page text so we can search it
+      for(let i = 0; i < this.pages.length; i++) {
+        this.getPageText(i);
+      }
+
       console.log('collection:' + this.collection);
       console.log(item);
       this.tileSourceUrls = getIIIFUrls(item, digitalApiPrefix, iiifPrefix, this.collection);
@@ -69,9 +122,7 @@ export class BookViewerComponent implements OnInit {
         tileSources: this.tileSourceUrls,
       });      
       console.log('found ' + this.tileSourceUrls.length + ' urls');
-    });
-
-     
+    }); 
 
     setInterval(() => {
       if(this.imagesLoaded) {
@@ -203,6 +254,9 @@ export class BookViewerComponent implements OnInit {
       }
       else if(this.imageToViewIndex + 1 === pageIndex){
         this.pageTwoText = page.text;
+      }
+      if(pageIndex === this.pages.length && this.queryMap.has('text')) {
+        this.handleSearch(this.queryMap.get('text'));
       }
     });
   }

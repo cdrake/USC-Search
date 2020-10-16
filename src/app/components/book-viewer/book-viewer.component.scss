@@ -26,3 +26,15 @@
     margin: 8px 8px 8px 0;
     justify-content: center;
 }
+
+.mat-form-field {
+    width: 100%;
+    margin: auto;
+    flex-direction: row;
+    flex-flow: column wrap;
+}
+
+
+button {
+    display: inline-block;
+}
