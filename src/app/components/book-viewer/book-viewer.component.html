@@ -21,6 +21,9 @@
                     <button id="send-button" type="button" matSuffix mat-fab color="primary" aria-label="Search" (click)="
                     handleSearch(searchInput.value);">
                         <mat-icon>search</mat-icon>
+                    </button>
+                    <button type="button" mat-fab color="primary" aria-label="Next" *ngIf="value">
+                        <mat-icon>forward</mat-icon>
                     </button>                    
                 </mat-form-field>
             </form>
