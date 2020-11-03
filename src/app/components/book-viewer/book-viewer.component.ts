@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input} from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input, Renderer2} from '@angular/core';
 import * as dragon from 'openseadragon'
 import { Observable } from 'rxjs';
 import { CONTENTdmItem, CONTENTdmItemNodePage, CONTENTdmItemPageInfo } from 'src/app/models/contentdm-item.model';
@@ -40,8 +40,10 @@ export class BookViewerComponent implements OnInit {
   value = '';
   queryMap: Map<string, string>;
 
-  constructor(private http: HttpClient, private store: Store<AppState>) { 
-    window['angularComponentRef'] = this; 
+  
+
+  constructor(private http: HttpClient, private store: Store<AppState>, private renderer: Renderer2) { 
+    window['angularComponentRef'] = this;
   }
 
   public setPageText(pageIndex: number, text: string): void {
@@ -90,6 +92,21 @@ export class BookViewerComponent implements OnInit {
     }
   }
 
+  addOverlay(): void {
+    const div = this.renderer.createElement('div');
+    this.renderer.setProperty(div, 'id', 'example-runtime-overlay');
+    const text = this.renderer.createText('Hello world!');
+    this.renderer.appendChild(div, text);
+    
+    this.osd.addOverlay(div, new dragon.Rect(0.33, 0.75, 0.2, 0.25));
+  }
+
+  removeOverlay(): void {
+    this.osd.removeOverlay('example-runtime-overlay');
+  }
+
+
+
   ngOnInit(): void {
     this.queryMap$ = this.store.select(state => state.queryMap);
     this.queryMap$.subscribe(queryMap => {
@@ -124,6 +141,8 @@ export class BookViewerComponent implements OnInit {
       console.log('found ' + this.tileSourceUrls.length + ' urls');
     }); 
 
+    
+
     setInterval(() => {
       if(this.imagesLoaded) {
         if(this.imageToViewIndex != this.currentPageIndex) {
@@ -132,6 +151,9 @@ export class BookViewerComponent implements OnInit {
           this.pageTwoText = '';
 
           try {
+            // add overlay
+            
+
             this.osd.world.removeAll();
             this.osd.world.update();
             // add both images

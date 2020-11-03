@@ -25,6 +25,16 @@
     text-align: center;
 }
 
+.highlight {
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    outline: 12px auto #0A7EbE;
+    background-color: white;
+    justify-content: center;
+    margin: auto;
+    text-align: center;
+}
+
 @media only screen and (max-width: 485px)  {
     .page-text {
         float: none;  

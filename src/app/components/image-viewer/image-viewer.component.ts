@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, Renderer2} from '@angular/core';
 import * as dragon from 'openseadragon'
 import { Observable } from 'rxjs';
 import { CONTENTdmItem, CONTENTdmItemNodePage, CONTENTdmItemPageInfo } from 'src/app/models/contentdm-item.model';
@@ -7,6 +7,7 @@ import { HighlightSearchTermsPipe } from 'src/app/pipes/highlight-search-terms.p
 import { LinkifyPipe } from 'src/app/pipes/linkify.pipe';
 import { getIIIFUrls, getPageInfoArray } from '../../utils/iiif/contentdm-iiif-utils';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {Guid} from '../../utils/guid/guid-utils';
 
 const iiifPrefix = "https://digital.tcl.sc.edu/digital/iiif";
 const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
@@ -27,8 +28,9 @@ export class ImageViewerComponent implements OnInit {
   pageInfo$: Observable<CONTENTdmItemPageInfo>;
   pages: CONTENTdmItemNodePage[];
   pageText: string;
+  osd: dragon.Viewer;
 
-  constructor(private http: HttpClient, private highlight: HighlightSearchTermsPipe, private linkify: LinkifyPipe, private domSanitizer: DomSanitizer) {
+  constructor(private http: HttpClient, private highlight: HighlightSearchTermsPipe, private linkify: LinkifyPipe, private domSanitizer: DomSanitizer, private renderer: Renderer2) {
     window['angularComponentRef'] = this;  
   }
 
@@ -44,7 +46,7 @@ export class ImageViewerComponent implements OnInit {
       console.log(item);
       const urls = getIIIFUrls(item, digitalApiPrefix, iiifPrefix, this.collection);
       console.log(urls);
-      const osd = new dragon.Viewer({
+      this.osd = new dragon.Viewer({
         element: this.viewer.nativeElement,
         showRotationControl: true,
         // Enable touch rotation on tactile devices
@@ -56,7 +58,7 @@ export class ImageViewerComponent implements OnInit {
         sequenceMode: true,
         tileSources: urls
       });
-      osd.addHandler('page', function(event) {
+      this.osd.addHandler('page', function(event) {
         console.log('Now on page', event.page);
         window['angularComponentRef'].pageIndexChanged(event.page);
       });
@@ -64,23 +66,47 @@ export class ImageViewerComponent implements OnInit {
         this.pageIndexChanged(0);
       }
       else {
-        console.log('no pages found');        
-        // if(item.objectInfo.) {
-        //   console.log('text field');
-        //   console.log(textField);
-        //   this.pageText.nativeElement.innerHTML = this.highlight.transform(textField.value, 'text');
-        // }
-        // else {
-        //   console.log('no text field found');
-        //   console.log(item);
-        // }
-        // if(item.objectInfo.hasOwnProperty('text')) {
+        console.log('no pages found');                
           this.pageText = item['text'];
-        //}
         console.log(this.pageText);
       }
 
     });
+  }
+
+  // creates overlay and returns overlay id
+  addTextOverlay(text: string, x: number, y: number): string {
+    const guid = Guid.newGuid();
+    const id = 'text-overlay-' + guid;
+    const div = this.renderer.createElement('div');
+    this.renderer.setProperty(div, 'id', id);
+    this.renderer.setAttribute(div, 'class', 'highlight');
+    const innerText = this.renderer.createText(text);
+    this.renderer.appendChild(div, innerText);
+    
+    this.osd.addOverlay(div, new dragon.Rect(x, y, 0.2, 0.07));
+    return id;
+  }
+
+
+
+  addExampleOverlays() {
+    this.addTextOverlay('important info about this point', 0.33, 0.5);
+    this.addTextOverlay('more important info', 0.13, 0.25);
+  }
+
+  addOverlay(): void {
+    const div = this.renderer.createElement('div');
+    this.renderer.setProperty(div, 'id', 'example-runtime-overlay');
+    this.renderer.setAttribute(div, 'class', 'highlight');
+    const text = this.renderer.createText('Important Information about this point');
+    this.renderer.appendChild(div, text);
+    
+    this.osd.addOverlay(div, new dragon.Rect(0.33, 0.5, 0.2, 0.07));
+  }
+
+  removeOverlay(overlayName: string): void {
+    this.osd.removeOverlay(overlayName);
   }
 
   pageIndexChanged(pageIndex: number): void {
