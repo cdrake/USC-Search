@@ -22,7 +22,7 @@
                     handleSearch(searchInput.value);">
                         <mat-icon>search</mat-icon>
                     </button>
-                    <button type="button" mat-fab color="primary" aria-label="Next" *ngIf="value">
+                    <button type="button" mat-fab color="primary" aria-label="Next" *ngIf="value" (click)="handleNextSearch();">
                         <mat-icon>forward</mat-icon>
                     </button>                    
                 </mat-form-field>

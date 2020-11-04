@@ -58,7 +58,29 @@ export class BookViewerComponent implements OnInit {
   }
 
   handleNextSearch() {
+    const text = this.queryMap.get('text');
+    const lowerText = text.toLocaleLowerCase();
+    console.log('current page is ' + this.currentPageIndex.toString());
+    for(const key of this.textIndexMap.keys()) {
 
+      console.log('page being searched is ' + key.toString());
+      if(key <= this.currentPageIndex + 1) {
+        console.log('ignoring page');
+        continue;
+      }
+      const pageText = this.textIndexMap.get(key);
+      if(pageText && pageText.toLocaleLowerCase().includes(lowerText)) {
+        console.log(lowerText + ' found');
+        if(key % 2 === 0) {
+          this.imageToViewIndex = key;
+        }
+        else {
+          this.imageToViewIndex = key - 1;
+        }
+        console.log('page index changed to ' + this.imageToViewIndex);
+        break;
+      }
+    }
   }
 
   handleSearch(text: string): void {
@@ -128,8 +150,12 @@ export class BookViewerComponent implements OnInit {
       console.log('collection:' + this.collection);
       console.log(item);
       this.tileSourceUrls = getIIIFUrls(item, digitalApiPrefix, iiifPrefix, this.collection);
+      //TODO(cdrake): remove after lazy loading implemented
+      this.tileSourceUrls =  this.tileSourceUrls.slice(0, 16);
       this.osd = new dragon.Viewer({
         element: this.viewer.nativeElement,
+        preserveViewport: true,
+        visibilityRatio: 1,
         // Enable touch rotation on tactile devices
         gestureSettingsTouch: {
             pinchToZoom: true,            
@@ -137,7 +163,17 @@ export class BookViewerComponent implements OnInit {
         prefixUrl: "//openseadragon.github.io/openseadragon/images/",
         autoResize: false,
         tileSources: this.tileSourceUrls,
-      });      
+      });
+
+      
+      // this.osd.addHandler('open', function() {
+      //   const style = 'height: ' 
+      //   + window['angularComponentRef'].osd.world.getItemAt(0).source.dimensions.y / window.devicePixelRatio + 'px;width: '        
+      //   + window['angularComponentRef'].osd.world.getItemAt(0).source.dimensions.y / window.devicePixelRatio + 'px;'
+      //   console.log('style is ' + style);
+      //   window['angularComponentRef'].renderer.setAttribute(window['angularComponentRef'].viewer.nativeElement, 'style', style);  
+      // });      
+
       console.log('found ' + this.tileSourceUrls.length + ' urls');
     }); 
 
@@ -152,8 +188,6 @@ export class BookViewerComponent implements OnInit {
 
           try {
             // add overlay
-            
-
             this.osd.world.removeAll();
             this.osd.world.update();
             // add both images
@@ -216,13 +250,18 @@ export class BookViewerComponent implements OnInit {
             if(undefinedImages.length === 0) {
               this.imagesLoaded = true;
               console.log('images loaded');
+
+              // set this so that the images will be arranged in the right order
+              this.currentPageIndex = -1;
             }
           }
 
           itemCount = this.osd.world.getItemCount();
-          const tiledImage = this.osd.world.getItemAt(2);
-          this.osd.world.removeItem(tiledImage);
-          itemCount = this.osd.world.getItemCount();
+          if(itemCount > 2) {
+            const tiledImage = this.osd.world.getItemAt(2);
+            this.osd.world.removeItem(tiledImage);
+            itemCount = this.osd.world.getItemCount();
+          }
 
           const firstTiledImage = this.osd.world.getItemAt(0);
           if(!this.secondImageLoaded) {
