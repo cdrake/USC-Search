@@ -13,20 +13,13 @@ export class HighlightSearchTermsPipe implements PipeTransform {
 
   constructor(private _domSanitizer: DomSanitizer, private store: Store<AppState>) {
     this.queryMap$ = this.queryMap$ = this.store.select(state => state.queryMap);
-    // this.queryMap$.subscribe(queryMap => {
-    //   this.queryMap = queryMap;
-    // });
   }
 
   transform(value: any, fieldName: string): Observable<string> {
     let markedText: string;
-    // const fieldValue = value.toString();
     return Observable.create(observer => {
       if(value) {
         this.queryMap$.subscribe((queryMap) => {
-          // console.log('Query Map for mark up');
-          // console.log(queryMap);
-          // console.log('Field value:' + value.changingThisBreaksApplicationSecurity);
           this.queryMap = queryMap;
           markedText = this.markSearchTerms(value.changingThisBreaksApplicationSecurity, fieldName);
           console.log('Marked text: ' + markedText);
@@ -45,6 +38,7 @@ export class HighlightSearchTermsPipe implements PipeTransform {
     //TODO(cdrake): tokenize queryMap search term unless in quotes
     if(this.queryMap.has(fieldName)) {
       const searchTerm = this.queryMap.get(fieldName).replace(/^['"]|['"]$/g, '');
+      
       // ignore already marked text
       const regexString = `(?!<mark>)(${searchTerm})(?![^<]*?<\/mark>)`;
       const re = new RegExp(regexString, 'gi');
