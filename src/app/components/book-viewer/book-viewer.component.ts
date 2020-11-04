@@ -84,11 +84,13 @@ export class BookViewerComponent implements OnInit {
   }
 
   handleSearch(text: string): void {
-    console.log('search text is ' + text);
-
     // update text search term
     this.queryMap.set('text', text);
     this.store.dispatch(new SetQueryMap(this.queryMap));
+
+    //HACK(cdrake): refresh text to reapply pipe transforms if we are on the same pages
+    this.pageOneText = this.pageOneText.trim();
+    this.pageTwoText = this.pageTwoText.trim();
 
     const lowerText = text.toLocaleLowerCase();
     for(const key of this.textIndexMap.keys()) {
