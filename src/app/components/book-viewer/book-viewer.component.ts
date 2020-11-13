@@ -187,45 +187,50 @@ export class BookViewerComponent implements OnInit {
           // reset text
           this.pageOneText = '';
           this.pageTwoText = '';
+          const imageToFetchIndex = this.imageToViewIndex - 1;
 
           try {
             // add overlay
             this.osd.world.removeAll();
             this.osd.world.update();
+            
             // add both images
-            const firstImage = this.imageIndexMap.get(this.imageToViewIndex);
+            const firstImage = this.imageIndexMap.get(imageToFetchIndex);
             if(firstImage) {
               this.osd.world.addItem(firstImage);
               // add text for page one
-              if(this.textIndexMap.has(this.imageToViewIndex)) {
-                this.pageOneText = this.textIndexMap.get(this.imageToViewIndex);
+              if(this.textIndexMap.has(imageToFetchIndex)) {
+                this.pageOneText = this.textIndexMap.get(imageToFetchIndex);
               }
               else {
                 console.log('text not found');
                 // request text
-                let i = this.imageToViewIndex                
-                this.getPageText(this.imageToViewIndex);
+                this.getPageText(imageToFetchIndex);
               }
 
-              const secondTiledImage = this.imageIndexMap.get(this.imageToViewIndex + 1);
-              if(secondTiledImage) {
-                this.osd.world.addItem(secondTiledImage);
-                secondTiledImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
-                // add text for page two
-                if(this.textIndexMap.has(this.imageToViewIndex + 1)) {                  
-                  this.pageTwoText = this.textIndexMap.get(this.imageToViewIndex + 1);
-                }
-                else {
-                  this.getPageText(this.imageToViewIndex + 1);
-                }
-              }
-              else {
-                console.log('no image found for second index');
-              }
               this.adjustBounds(firstImage);
             }
             else {
               console.log('no image found for first index');
+            }
+            const secondTiledImage = this.imageIndexMap.get(imageToFetchIndex + 1);
+            if(secondTiledImage) {
+              this.osd.world.addItem(secondTiledImage);
+              secondTiledImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
+              // add text for page two
+              if(this.textIndexMap.has(imageToFetchIndex + 1)) {                  
+                this.pageTwoText = this.textIndexMap.get(imageToFetchIndex + 1);
+              }
+              else {
+                this.getPageText(imageToFetchIndex + 1);
+              }
+              if(!firstImage) {
+                this.adjustBounds(secondTiledImage);
+                secondTiledImage.setPosition(new dragon.Point(2 + PAGE_BUFFER_SIZE, 0));
+              }
+            }
+            else {
+              console.log('no image found for second index');
             }
             this.currentPageIndex = this.imageToViewIndex;
             console.log('current page is ' + this.currentPageIndex);
@@ -258,18 +263,18 @@ export class BookViewerComponent implements OnInit {
             }
           }
 
-          itemCount = this.osd.world.getItemCount();
-          if(itemCount > 2) {
-            const tiledImage = this.osd.world.getItemAt(2);
-            this.osd.world.removeItem(tiledImage);
-            itemCount = this.osd.world.getItemCount();
-          }
+          // itemCount = this.osd.world.getItemCount();
+          // if(itemCount > 2) {
+          //   const tiledImage = this.osd.world.getItemAt(2);
+          //   this.osd.world.removeItem(tiledImage);
+          //   itemCount = this.osd.world.getItemCount();
+          // }
 
-          const firstTiledImage = this.osd.world.getItemAt(0);
-          if(!this.secondImageLoaded) {
-            this.secondImageLoaded = true;
-          }
-          this.adjustBounds(firstTiledImage);
+          // const firstTiledImage = this.osd.world.getItemAt(0);
+          // if(!this.secondImageLoaded) {
+          //   this.secondImageLoaded = true;
+          // }
+          // this.adjustBounds(firstTiledImage);
         }
       }
     }, 1000);
