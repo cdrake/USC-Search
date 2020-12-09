@@ -7,6 +7,7 @@ import { getPageInfoArray, getIIIFUrls } from 'src/app/utils/iiif/contentdm-iiif
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/models/app-state.model';
 import { SetQueryMap } from 'src/app/store/actions/query-map.actions';
+import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
 const iiifPrefix = "https://digital.tcl.sc.edu/digital/iiif";
 const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
@@ -31,6 +32,7 @@ export class BookViewerComponent implements OnInit {
   secondImageLoaded = false;
   imageIndexMap = new Map<number, dragon.TiledImage>();
   textIndexMap = new Map<number, string>();
+  textRequestedForPages: Array<boolean>;
   currentPageIndex = 0;
   imagesLoaded = false;
   imageToViewIndex = 0;
@@ -129,7 +131,86 @@ export class BookViewerComponent implements OnInit {
     this.osd.removeOverlay('example-runtime-overlay');
   }
 
+  loadImage(tileSourceIndex: number): void {
+    console.log('load image called for image: ' + tileSourceIndex);
+    if(this.tileSourceUrls.length > tileSourceIndex) {
+      console.log('loading tiled image');
+      if(!this.imageIndexMap.has(tileSourceIndex)) {
+        console.log('requesting new tiled image');
+        this.osd.addTiledImage({tileSource: this.tileSourceUrls[tileSourceIndex]});      
+      }
+      else {
+        console.log('adding image from cache');
+        this.osd.world.addItem(this.imageIndexMap.get(tileSourceIndex));
+      }
+    }
+    else {
+      console.log(tileSourceIndex + ' is larger than array length ' + this.tileSourceUrls.length);
+    }
 
+    // if(this.tileSourceUrls.length < tileSourceIndex + 1 && (!this.imageIndexMap.has(tileSourceIndex + 1))) {
+    //   this.osd.addTiledImage({tileSource: this.tileSourceUrls[tileSourceIndex + 1]});      
+    // }
+
+  }
+
+  
+  
+  cacheImages(imageIndex: number): void {
+    // make sure we add any loaded images to our cache   
+    const itemCount = this.osd.world.getItemCount();
+    console.log('caching image ' + imageIndex);
+    if(itemCount > 0) {
+      let loadedImage = this.osd.world.getItemAt(0);
+      if(loadedImage && !this.imageIndexMap.has(imageIndex)) {
+        this.imageIndexMap.set(imageIndex, loadedImage);
+      }
+
+      if(itemCount > 1) {
+        loadedImage = this.osd.world.getItemAt(1); 
+        if(loadedImage && !this.imageIndexMap.has(imageIndex + 1)) {
+          this.imageIndexMap.set(imageIndex + 1, loadedImage);
+        }
+      }
+      else {
+        console.log('only one image loaded');
+      }
+    }
+
+    // remove all images
+    this.osd.world.removeAll();
+    this.osd.world.update();
+
+  }
+
+  adjustCanvas(): void {
+    const itemCount = this.osd.world.getItemCount();
+    if(itemCount > 0) {
+      let loadedImage = this.osd.world.getItemAt(0);
+
+      // Expand the canvas for two images
+      this.adjustBounds(loadedImage);
+
+      if(itemCount > 1) {
+        loadedImage = this.osd.world.getItemAt(1); 
+        if(loadedImage) {
+          loadedImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
+        }
+      }
+    }
+
+  }
+
+  addTextForImages(): void {
+    const imageToFetchIndex = this.imageToViewIndex - 1;
+  }
+
+  // checkForImagesLoaded(): void {
+  //   // Do we have the page we want to view loaded?
+
+  //   // Do we have the second page we want to view loaded?
+
+  // }
 
   ngOnInit(): void {
     this.queryMap$ = this.store.select(state => state.queryMap);
@@ -152,10 +233,13 @@ export class BookViewerComponent implements OnInit {
       console.log('collection:' + this.collection);
       console.log(item);
       this.tileSourceUrls = getIIIFUrls(item, digitalApiPrefix, iiifPrefix, this.collection);
-      //TODO(cdrake): remove after lazy loading implemented
-      this.tileSourceUrls =  this.tileSourceUrls.slice(0, 16);
+      this.textRequestedForPages = new Array(this.tileSourceUrls.length);
+      // load the first  two urls
+      
+      // this.tileSourceUrls =  this.tileSourceUrls.slice(0, 2);
       this.osd = new dragon.Viewer({
         element: this.viewer.nativeElement,
+        showRotationControl: true,
         preserveViewport: true,
         visibilityRatio: 1,
         // Enable touch rotation on tactile devices
@@ -164,119 +248,45 @@ export class BookViewerComponent implements OnInit {
         },
         prefixUrl: "//openseadragon.github.io/openseadragon/images/",
         autoResize: false,
-        tileSources: this.tileSourceUrls,
+        tileSources: this.tileSourceUrls[0]
       });
 
-      
-      // this.osd.addHandler('open', function() {
-      //   const style = 'height: ' 
-      //   + window['angularComponentRef'].osd.world.getItemAt(0).source.dimensions.y / window.devicePixelRatio + 'px;width: '        
-      //   + window['angularComponentRef'].osd.world.getItemAt(0).source.dimensions.y / window.devicePixelRatio + 'px;'
-      //   console.log('style is ' + style);
-      //   window['angularComponentRef'].renderer.setAttribute(window['angularComponentRef'].viewer.nativeElement, 'style', style);  
-      // });      
-
-      console.log('found ' + this.tileSourceUrls.length + ' urls');
+      // Load the cover image
+      //this.loadImage(0);
+      this.osd.world.addHandler('add-item', function(event) {
+        const world: dragon.World = window['angularComponentRef'].osd.world;
+        if(world.getItemCount() == 2) {
+          console.log('adjusting canvas');
+          window['angularComponentRef'].adjustCanvas();
+        }
+      });
     }); 
 
-    
-
     setInterval(() => {
-      if(this.imagesLoaded) {
-        if(this.imageToViewIndex != this.currentPageIndex) {
-          // reset text
-          this.pageOneText = '';
-          this.pageTwoText = '';
-          const imageToFetchIndex = this.imageToViewIndex - 1;
+      if(this.imageToViewIndex != this.currentPageIndex) {
+        console.log('page changed');
+        const imageToFetchIndex = this.imageToViewIndex - 1;    
+                
+        this.cacheImages(imageToFetchIndex - 2);
 
-          try {
-            // add overlay
-            this.osd.world.removeAll();
-            this.osd.world.update();
-            
-            // add both images
-            const firstImage = this.imageIndexMap.get(imageToFetchIndex);
-            if(firstImage) {
-              this.osd.world.addItem(firstImage);
-              // add text for page one
-              if(this.textIndexMap.has(imageToFetchIndex)) {
-                this.pageOneText = this.textIndexMap.get(imageToFetchIndex);
-              }
-              else {
-                console.log('text not found');
-                // request text
-                this.getPageText(imageToFetchIndex);
-              }
+        this.loadImage(imageToFetchIndex);
+        this.loadImage(imageToFetchIndex + 1);
 
-              this.adjustBounds(firstImage);
-            }
-            else {
-              console.log('no image found for first index');
-            }
-            const secondTiledImage = this.imageIndexMap.get(imageToFetchIndex + 1);
-            if(secondTiledImage) {
-              this.osd.world.addItem(secondTiledImage);
-              secondTiledImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
-              // add text for page two
-              if(this.textIndexMap.has(imageToFetchIndex + 1)) {                  
-                this.pageTwoText = this.textIndexMap.get(imageToFetchIndex + 1);
-              }
-              else {
-                this.getPageText(imageToFetchIndex + 1);
-              }
-              if(!firstImage) {
-                this.adjustBounds(secondTiledImage);
-                secondTiledImage.setPosition(new dragon.Point(2 + PAGE_BUFFER_SIZE, 0));
-              }
-            }
-            else {
-              console.log('no image found for second index');
-            }
-            this.currentPageIndex = this.imageToViewIndex;
-            console.log('current page is ' + this.currentPageIndex);
-
-          }
-          catch(e) {
-            console.log(e);
-            this.imagesLoaded = false;
-          }
+        if(this.textIndexMap.has(imageToFetchIndex)) {
+          this.pageOneText = this.textIndexMap.get(imageToFetchIndex);
         }
-      }
-      else {
-        let itemCount = this.osd.world.getItemCount();
-        if(itemCount === this.tileSourceUrls.length) {                 
-          
-          for(let i = 0; i <  itemCount; i++) {
-            const tiledImage = this.osd.world.getItemAt(i);
-            this.imageIndexMap.set(i, tiledImage);
-            const undefinedImages = Array.from(this.imageIndexMap.values()).filter(u => u === undefined);
-            console.log('undefinedImages');
-            console.log(undefinedImages);
-            console.log('image index map:');
-            console.log(this.imageIndexMap);
-            if(undefinedImages.length === 0) {
-              this.imagesLoaded = true;
-              console.log('images loaded');
-
-              // set this so that the images will be arranged in the right order
-              this.currentPageIndex = -1;
-            }
-          }
-
-          // itemCount = this.osd.world.getItemCount();
-          // if(itemCount > 2) {
-          //   const tiledImage = this.osd.world.getItemAt(2);
-          //   this.osd.world.removeItem(tiledImage);
-          //   itemCount = this.osd.world.getItemCount();
-          // }
-
-          // const firstTiledImage = this.osd.world.getItemAt(0);
-          // if(!this.secondImageLoaded) {
-          //   this.secondImageLoaded = true;
-          // }
-          // this.adjustBounds(firstTiledImage);
+        else {
+          this.getPageText(imageToFetchIndex);
         }
-      }
+        if(this.textIndexMap.has(imageToFetchIndex + 1)) {                  
+          this.pageTwoText = this.textIndexMap.get(imageToFetchIndex + 1);
+        }
+        else {
+          this.getPageText(imageToFetchIndex + 1);
+        }
+
+        this.currentPageIndex = this.imageToViewIndex;
+      }      
     }, 1000);
   }
 
