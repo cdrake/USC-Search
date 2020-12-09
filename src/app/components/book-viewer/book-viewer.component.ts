@@ -186,15 +186,16 @@ export class BookViewerComponent implements OnInit {
   adjustCanvas(): void {
     const itemCount = this.osd.world.getItemCount();
     if(itemCount > 0) {
-      let loadedImage = this.osd.world.getItemAt(0);
+      const firstImage = this.osd.world.getItemAt(0);
 
       // Expand the canvas for two images
-      this.adjustBounds(loadedImage);
+      this.adjustBounds(firstImage);
 
       if(itemCount > 1) {
-        loadedImage = this.osd.world.getItemAt(1); 
-        if(loadedImage) {
-          loadedImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
+        const secondImage = this.osd.world.getItemAt(1); 
+        if(secondImage) {
+          secondImage.setHeight(firstImage.getBounds().height);
+          secondImage.setPosition(new dragon.Point(1 + PAGE_BUFFER_SIZE, 0));
         }
       }
     }
