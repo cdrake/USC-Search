@@ -59,56 +59,47 @@ export class BookViewerComponent implements OnInit {
     this.textIndexMap.set(pageIndex, text);
   }
 
-  handleNextSearch() {
-    const text = this.queryMap.get('text');
-    const lowerText = text.toLocaleLowerCase();
-    console.log('current page is ' + this.currentPageIndex.toString());
-    for(const key of this.textIndexMap.keys()) {
+  handleTextSearch(text: string, startingPageIndex: number) {
+    const currentSearchTerm = this.queryMap.get('text');
+    if(currentSearchTerm != text) {
+      // update text search term
+      this.queryMap.set('text', text);
+      this.store.dispatch(new SetQueryMap(this.queryMap));
+    }
 
+    const lowerText = text.toLocaleLowerCase();
+    for(const key of this.textIndexMap.keys()) {
       console.log('page being searched is ' + key.toString());
-      if(key <= this.currentPageIndex + 1) {
-        console.log('ignoring page');
+      if(key < startingPageIndex) {
+        console.log('ignoring page ' + key);
         continue;
       }
       const pageText = this.textIndexMap.get(key);
       if(pageText && pageText.toLocaleLowerCase().includes(lowerText)) {
-        console.log(lowerText + ' found');
-        if(key % 2 === 0) {
-          this.pageToViewIndex = key;
-        }
-        else {
+        console.log(lowerText + ' found');        
+        if(key % 2 === 0 && key != 0) {
           this.pageToViewIndex = key - 1;
         }
-        console.log('page index changed to ' + this.pageToViewIndex);
+        else {
+          this.pageToViewIndex = key;
+        }
+        if(this.pageToViewIndex != this.currentPageIndex) {
+          this.changePage(this.pageToViewIndex);
+          console.log('page index changed to ' + this.pageToViewIndex);
+        }
         break;
       }
     }
+
+  }
+
+  handleNextSearch() {
+    const text = this.queryMap.get('text');
+    this.handleTextSearch(text, this.currentPageIndex + 2);
   }
 
   handleSearch(text: string): void {
-    // update text search term
-    this.queryMap.set('text', text);
-    this.store.dispatch(new SetQueryMap(this.queryMap));
-
-    //HACK(cdrake): refresh text to reapply pipe transforms if we are on the same pages
-    this.pageOneText = this.pageOneText.trim();
-    this.pageTwoText = this.pageTwoText.trim();
-
-    const lowerText = text.toLocaleLowerCase();
-    for(const key of this.textIndexMap.keys()) {
-      const pageText = this.textIndexMap.get(key);
-      if(pageText && pageText.toLocaleLowerCase().includes(lowerText)) {
-        console.log(lowerText + ' found');
-        if(key % 2 === 0) {
-          this.pageToViewIndex = key;
-        }
-        else {
-          this.pageToViewIndex = key - 1;
-        }
-        console.log('page index changed to ' + this.pageToViewIndex);
-        break;
-      }
-    }
+    this.handleTextSearch(text, this.currentPageIndex);
   }
 
   handleKeyDown(event: KeyboardEvent) {
@@ -163,8 +154,12 @@ export class BookViewerComponent implements OnInit {
         }
       }
       else {
-        firstImage.setPosition(new dragon.Point(.5, 0));
+        console.log('moving image to center of page');        
+        firstImage.setPosition(new dragon.Point(.5, 0)); 
+        
       }
+      
+      this.osd.viewport.update();
     }
 
   }
@@ -236,7 +231,7 @@ export class BookViewerComponent implements OnInit {
           console.log('adjusting canvas');
           component.adjustCanvas();
           component.currentPageIndex = component.pageToViewIndex;
-        }
+        }        
       });
 
       // Load the cover image
@@ -256,6 +251,13 @@ export class BookViewerComponent implements OnInit {
     // load the cover image by itself
     if(newPageIndex > 0) {
       this.loadImage(newPageIndex + 1);
+
+      if(this.textIndexMap.has(newPageIndex + 1)) {                  
+        this.pageTwoText = this.textIndexMap.get(newPageIndex + 1);
+      }
+      else {
+        this.getPageText(newPageIndex + 1);
+      }
     }
 
     if(this.textIndexMap.has(newPageIndex)) {
@@ -264,12 +266,7 @@ export class BookViewerComponent implements OnInit {
     else {
       this.getPageText(newPageIndex);
     }
-    if(this.textIndexMap.has(newPageIndex + 1)) {                  
-      this.pageTwoText = this.textIndexMap.get(newPageIndex + 1);
-    }
-    else {
-      this.getPageText(newPageIndex + 1);
-    }
+    
   }
 
   adjustBounds(tiledImage: dragon.TiledImage): void {
