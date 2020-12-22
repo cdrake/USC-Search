@@ -8,6 +8,8 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/models/app-state.model';
 import { SetQueryMap } from 'src/app/store/actions/query-map.actions';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {SearchResultsDialogComponent, DialogData} from '../search-results-dialog/search-results-dialog.component';
 
 const iiifPrefix = "https://digital.tcl.sc.edu/digital/iiif";
 const digitalApiPrefix = 'https://digital.tcl.sc.edu/digital';
@@ -46,7 +48,7 @@ export class BookViewerComponent implements OnInit {
 
   
 
-  constructor(private http: HttpClient, private store: Store<AppState>, private renderer: Renderer2) { 
+  constructor(private http: HttpClient, private store: Store<AppState>, private renderer: Renderer2, public dialog: MatDialog) { 
     window['angularComponentRef'] = this;
   }
 
@@ -61,6 +63,20 @@ export class BookViewerComponent implements OnInit {
     this.textIndexMap.set(pageIndex, text);
   }
 
+  async openCancelOkDialog(title: string, message: string): Promise<boolean> {
+    const dialogRef = this.dialog.open(SearchResultsDialogComponent, {
+      width: '250px',
+      data: {message, title}
+    });
+
+    const result = await dialogRef.afterClosed();
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log('The dialog was closed');
+    //   console.log(result);
+    // });
+    return result.toPromise();
+  }
+
   handleTextSearch(text: string, startingPageIndex: number) {
     const currentSearchTerm = this.queryMap.get('text');
     if(currentSearchTerm != text) {
@@ -68,7 +84,7 @@ export class BookViewerComponent implements OnInit {
       this.queryMap.set('text', text);
       this.store.dispatch(new SetQueryMap(this.queryMap));
     }
-
+    let textFound = false;
     const lowerText = text.toLocaleLowerCase();
     for(const key of this.textIndexMap.keys()) {
       console.log('page being searched is ' + key.toString());
@@ -78,6 +94,7 @@ export class BookViewerComponent implements OnInit {
       }
       const pageText = this.textIndexMap.get(key);
       if(pageText && pageText.toLocaleLowerCase().includes(lowerText)) {
+        textFound = true;
         console.log(lowerText + ' found');        
         if(key % 2 === 0 && key != 0) {
           this.pageToViewIndex = key - 1;
@@ -95,6 +112,19 @@ export class BookViewerComponent implements OnInit {
           this.pageTwoText = this.textIndexMap.get(this.pageToViewIndex + 1) + ' ';
         }
         break;
+      }
+    }
+
+    if(!textFound) {
+      if(startingPageIndex === 0) {
+        this.openCancelOkDialog('No results found', 'Choose another search term');
+      }
+      else {
+        this.openCancelOkDialog('No results found', 'Search from the beginning?').then(result => {
+          if(result) {
+            this.handleTextSearch(text, 0);
+          }
+        });
       }
     }
 

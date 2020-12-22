@@ -30,6 +30,8 @@ import { HighlightSearchTermsPipe } from './pipes/highlight-search-terms.pipe';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { BookViewerComponent } from './components/book-viewer/book-viewer.component';
 import {MatButtonModule} from '@angular/material/button';
+import { SearchResultsDialogComponent } from './components/search-results-dialog/search-results-dialog.component';
+import {MatDialogModule} from '@angular/material/dialog';
 
 export function initializeApp(appConfig: AppConfigService) {
   console.log('initalize app called');
@@ -51,6 +53,7 @@ export function initializeApp(appConfig: AppConfigService) {
     PageInfoComponent,
     HighlightSearchTermsPipe,
     BookViewerComponent,
+    SearchResultsDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -60,6 +63,7 @@ export function initializeApp(appConfig: AppConfigService) {
     FormsModule,
     HttpClientModule,
     MatButtonModule,
+    MatDialogModule,
     MatExpansionModule,
     MatIconModule,
     MatInputModule,
