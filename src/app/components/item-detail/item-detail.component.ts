@@ -17,7 +17,8 @@ const formats = ['video', 'audio', 'image'];
 export class ItemDetailComponent implements OnInit {
   collection: string;
   id: string;
-  key: string;  
+  key: string;
+  page: number;  
   dataSource: DataSource;  
   appConfig$:Observable<AppConfig>;
   item$: Observable<CONTENTdmItem>;
@@ -31,6 +32,7 @@ export class ItemDetailComponent implements OnInit {
       this.collection = params['collection'];
       this.id = params['id'];
       this.key = params['key'];
+      this.page = params['page'];
       this.appConfig$.subscribe(appConfig => {
         this.dataSource = appConfig.dataSources.find(key => key.key === this.key);
         console.log('data source loaded');

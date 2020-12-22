@@ -23,6 +23,7 @@ export class BookViewerComponent implements OnInit {
   @ViewChild('viewer') viewer: ElementRef;
   @Input() book$: Observable<CONTENTdmItem>;
   @Input() collection: string;
+  @Input() page: number;
   pageInfo$: Observable<CONTENTdmItemPageInfo>;
   queryMap$: Observable<Map<string, string>>;
   osd: dragon.Viewer;
@@ -200,7 +201,6 @@ export class BookViewerComponent implements OnInit {
         },
         prefixUrl: "//openseadragon.github.io/openseadragon/images/",
         autoResize: false,
-        // tileSources: this.tileSourceUrls[0]
       });
 
       // Add handler to cache images as we load them to prevent re-requesting 
@@ -234,8 +234,10 @@ export class BookViewerComponent implements OnInit {
         }        
       });
 
-      // Load the cover image
-      this.loadImage(0);
+      // Load the cover image if no other page was specified
+      this.pageToViewIndex = this.page ? this.getLeftPage(this.page) : 0;
+      console.log('loading page ' + this.pageToViewIndex);
+      this.changePage(this.pageToViewIndex);
     }); 
   }
 
@@ -320,4 +322,17 @@ export class BookViewerComponent implements OnInit {
     });
   }
 
+  getLeftPage(pageIndex: number): number {
+    let leftPageIndex = 0;
+    if(pageIndex > 0) {
+      if(pageIndex % 2 === 0) {
+        leftPageIndex = pageIndex - 1;
+      }
+      else {
+        leftPageIndex = pageIndex;
+      }
+    }
+    
+    return leftPageIndex;
+  }
 }

@@ -8,6 +8,7 @@ const routes: Routes = [
   {path: '', component: SearchComponent},
   {path: 'results', component: SearchResultsComponent},
   {path: 'item/:key/:collection/:id', component: ItemDetailComponent},
+  {path: 'item/:key/:collection/:id/:page', component: ItemDetailComponent},
 ];
 
 @NgModule({

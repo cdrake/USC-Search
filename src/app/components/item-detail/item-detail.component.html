@@ -6,7 +6,8 @@
     <div [ngSwitch]="getFormat(item).substr(0, 5)">
         <app-book-viewer *ngSwitchCase="'book'"
             [book$]="item$"
-            [collection]="collection" 
+            [collection]="collection"
+            [page]="page" 
         ></app-book-viewer>          
         <app-image-viewer *ngSwitchCase="'image'" 
                     [image$]="item$"
