@@ -12,17 +12,17 @@
             </mat-panel-title>
             </mat-expansion-panel-header>
             <form name="searchForm" class="center">
-                <mat-form-field class="example-form-field">
+                <mat-form-field class="text-search-form-field">
                     <mat-label>Search</mat-label>
-                    <input name="searchInput" matInput #searchInput type="search" [(ngModel)]="value" (keyup)="handleKeyDown($event)">
+                    <input name="searchInput" matInput #searchInput type="search" [(ngModel)]="value" (keyup)="handleKeyDown($event)" (change)="newTextSearch = true">
                     <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear">
-                      <mat-icon>close</mat-icon>
+                        <mat-icon>close</mat-icon>
                     </button>
-                    <button id="send-button" type="button" matSuffix mat-fab color="primary" aria-label="Search" (click)="
+                    <button id="search-button" type="button" matSuffix mat-fab color="primary" aria-label="Search" *ngIf="newTextSearch" (click)="
                     handleSearch(searchInput.value);">
                         <mat-icon>search</mat-icon>
                     </button>
-                    <button type="button" mat-fab color="primary" aria-label="Next" *ngIf="value" (click)="handleNextSearch();">
+                    <button type="button" matSuffix mat-fab color="primary" aria-label="Next" *ngIf="!newTextSearch" (click)="handleNextSearch();">
                         <mat-icon>forward</mat-icon>
                     </button>                    
                 </mat-form-field>

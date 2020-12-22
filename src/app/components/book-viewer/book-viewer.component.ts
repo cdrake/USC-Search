@@ -42,6 +42,7 @@ export class BookViewerComponent implements OnInit {
   pageTwoText = '';
   value = '';
   queryMap: Map<string, string>;
+  newTextSearch = true;
 
   
 
@@ -88,6 +89,11 @@ export class BookViewerComponent implements OnInit {
           this.changePage(this.pageToViewIndex);
           console.log('page index changed to ' + this.pageToViewIndex);
         }
+        else {
+          // reload text to get markup added for found text (added whitespace to trigger change)
+          this.pageOneText = this.textIndexMap.get(this.pageToViewIndex) + ' ';          
+          this.pageTwoText = this.textIndexMap.get(this.pageToViewIndex + 1) + ' ';
+        }
         break;
       }
     }
@@ -100,6 +106,7 @@ export class BookViewerComponent implements OnInit {
   }
 
   handleSearch(text: string): void {
+    this.newTextSearch = false;
     this.handleTextSearch(text, this.currentPageIndex);
   }
 
@@ -171,6 +178,9 @@ export class BookViewerComponent implements OnInit {
       console.log(queryMap);
       this.queryMap = queryMap;
       this.value = this.queryMap.has('text') ? this.queryMap.get('text') : '';
+      if(this.value.length > 0) {
+        this.newTextSearch = false;
+      }
     });
   }
 
