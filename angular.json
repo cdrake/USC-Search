@@ -27,8 +27,10 @@
               "src/favicon.ico",
               "src/assets"
             ],
-            "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+            "styles": [              
+              {
+                "input": "src/gamecock-theme.scss"
+              },
               "src/styles.scss"
             ],
             "scripts": []
@@ -93,7 +95,9 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              {
+                "input": "src/gamecock-theme.scss"
+              },
               "src/styles.scss"
             ],
             "scripts": []

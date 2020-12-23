@@ -1,0 +1,10 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$gamecock-theme-primary: mat-palette($mat-red, A700, A100, A400);
+$gamecock-theme-accent: mat-palette($mat-gray, A900, A100, A400);
+$gamecock-theme-warn: mat-palette($mat-yellow);
+
+$gamecock-theme: mat-light-theme($gamecock-theme-primary, $gamecock-theme-accent, $gamecock-theme-warn);
+
+@include angular-material-theme($gamecock-theme);
