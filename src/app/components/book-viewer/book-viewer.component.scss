@@ -23,9 +23,14 @@
 
 .button-container {
     display: flex;    
-    width: 220px;
+    width: 100%;
     margin: 8px 8px 8px 0;
     justify-content: center;
+    align-items: center;
+}
+
+.page-nav-buttons {
+    width: 120px;
 }
 
 .mat-form-field {
