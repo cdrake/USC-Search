@@ -10,26 +10,22 @@
 @media only screen and (max-width: 485px)  {
     
     mat-expansion-panel {
-        width: 75%!important;
-        margin: auto;
-        padding: 10px;
+        margin: 0px 15px;
+        // padding: 0px;        
     }
 
     app-item-metadata {
         width: 100%!important;
-        margin: auto;
-        padding: 10px;
     }
 
     .item-viewer {
-        width: 75%!important;
         margin: auto;
     }
 
-    // .item-title {
-    //     width: 75%!important;
-    //     margin: auto;
-    // }
+    .item-title {
+        width: 75%!important;
+        margin: auto;
+    }
     
     ul {
         padding: 0px!important;
