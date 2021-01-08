@@ -1,15 +1,17 @@
-<form name="searchForm" class="center">
-    <mat-form-field class="example-form-field">
-        <mat-label>Search</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <input name="searchInput" matInput #searchInput type="search" [(ngModel)]="value" (keyup)="handleKeyDown($event)">
-        <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear">
-          <mat-icon>close</mat-icon>
-        </button>
-        <button id="send-button" type="button" matSuffix mat-fab color="primary" aria-label="Send message" (click)="
-        handleUserMessage(searchInput.value); searchInput.value = '';
-        "    >
-            <mat-icon>search</mat-icon>
+<div class="center">  
+  <form id="searchForm" name="searchForm" >
+      <mat-form-field class="search-form-field">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input name="searchInput" matInput #searchInput type="search" [(ngModel)]="value" (keyup)="handleKeyDown($event)">
+          <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear">
+            <mat-icon>close</mat-icon>
           </button>
-    </mat-form-field>
-</form>
+          <button id="send-button" type="button" matSuffix mat-fab color="primary" aria-label="Send message" (click)="
+          handleUserMessage(searchInput.value); searchInput.value = '';
+          "    >
+              <mat-icon>search</mat-icon>
+            </button>
+      </mat-form-field>
+  </form>
+</div>
